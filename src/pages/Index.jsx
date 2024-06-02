@@ -8,8 +8,14 @@ const Index = () => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch("https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=auto:ip");
+        const response = await fetch("https://api.weatherapi.com/v1/current.json?key=VALID_API_KEY&q=auto:ip");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
+        if (!data || !data.current || !data.current.condition) {
+          throw new Error("Invalid API response");
+        }
         const condition = data.current.condition.text.toLowerCase();
 
         let description = "";
@@ -25,6 +31,7 @@ const Index = () => {
 
         setWeatherDescription(description);
       } catch (error) {
+        console.error("Error fetching weather data:", error);
         setWeatherDescription("Unable to fetch weather data. Please try again later.");
       } finally {
         setLoading(false);
